@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DialogButton" parent="@android:style/Widget.Button">
+        <item name="android:background">@color/palette_color1</item>
+        <item name="android:textColor">@color/palette_color4</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="FullscreenTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+</resources>
