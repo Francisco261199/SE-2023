@@ -4,7 +4,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Client {
-    private static final String BASE_URL = "http://<raspberry-pi-ip>:<port>/";
+    private static String BASE_URL = "http://<raspberry-pi-ip>:<port>/";
     private static WebInterface service;
 
     public static WebInterface getService() {
@@ -16,6 +16,10 @@ public class Client {
             service = retrofit.create(WebInterface.class);
         }
         return service;
+    }
+
+    public static void setURL(String url) {
+        BASE_URL = url;
     }
 
 }

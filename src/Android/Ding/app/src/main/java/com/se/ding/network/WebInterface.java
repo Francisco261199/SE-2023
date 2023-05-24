@@ -9,15 +9,15 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface WebInterface {
-    @POST("login")
+    @POST("/user/login")
     Call<AccessToken> login(@Body LoginRequest loginRequest);
 
-    @POST("users")
+    @POST("/user/new")
     Call<Void> createUser(@Body User user);
 
-    @GET("videos")
+    @GET("/videos")
     Call<List<Video>> getVideoCatalog(@Header("Authorization") String accessToken);
 
-    @GET("live")
+    @GET("/live")
     Call<Video> getCameraFeed(@Header("Authorization") String accessToken);
 }

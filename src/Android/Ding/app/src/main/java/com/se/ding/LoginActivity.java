@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,9 +37,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
-        finish();
+        finish();*/
 
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -53,8 +54,17 @@ public class LoginActivity extends AppCompatActivity {
                         String token = task.getResult();
                         Log.d("FCM", token);
                         Toast.makeText(LoginActivity.this, token, Toast.LENGTH_SHORT).show();
+                        //TextView testText = findViewById(R.id.textView);
+                        //testText.setText(token);
                     }
                 });
+
+        EditText serverAddress = findViewById(R.id.server_edittext);
+        Button connectButton = findViewById(R.id.connect_button);
+        connectButton.setOnClickListener(v -> {
+            String address = serverAddress.getText().toString();
+            Client.setURL(address);
+        });
 
         mUsernameEditText = findViewById(R.id.username_edittext);
         mPasswordEditText = findViewById(R.id.password_edittext);

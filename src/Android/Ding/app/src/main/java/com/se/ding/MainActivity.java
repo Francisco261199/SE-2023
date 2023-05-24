@@ -44,20 +44,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
         String accessToken = sharedPref.getString("access_token", null);
         if (accessToken == null) {
             // User needs to log in
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        }*/
+        }
 
         mLiveButton = findViewById(R.id.live_button);
         mLogoutButton = findViewById(R.id.logout_button);
         mNotificationsButton = findViewById(R.id.notifications_button);
 
-        videoCatalog = findViewById(R.id.video_catalog);
+        /*videoCatalog = findViewById(R.id.video_catalog);
         videoCatalog.setLayoutManager(new GridLayoutManager(this, 1));
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
         videoAdapter = new VideoAdapter(videoList, this);
-        videoCatalog.setAdapter(videoAdapter);
+        videoCatalog.setAdapter(videoAdapter);*/
 
         // Notify the adapter that a new item has been inserted
         /*videoAdapter.notifyItemInserted(videoList.size() - 1);
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*Call<List<Video>> call = Client.getService().getVideoCatalog(accessToken);
+        Call<List<Video>> call = Client.getService().getVideoCatalog(accessToken);
         call.enqueue(new Callback<List<Video>>() {
             @Override
             public void onResponse(Call<List<Video>> call, Response<List<Video>> response) {
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 // Handle the error
                 Toast.makeText(MainActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
             }
-        });*/
+        });
 
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
