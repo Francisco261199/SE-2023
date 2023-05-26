@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const token = require('../controllers/auth')
+const token = require('../controllers/auth');
 
 var router = express.Router()
 
@@ -35,11 +35,18 @@ router.get('/', async (req, res) => {
         res.json(formattedVideos);
     } catch (err) {
         console.error('Failed to fetch videos:', err);
-        res.status(500).json({ message: 'Failed to fetch videos' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
     
 router.get('/:filename', (req, res) => {
+
+    response = token.authenticateToken(req,res)
+    if (response !== "User validated") {
+        console.log(response)
+        return res.status(400).json({ message: response })
+    }
+    
     const filename = req.params.filename;
     
     fs.readdir(RECORDINGS_FOLDER, (err, files) => {
