@@ -15,7 +15,7 @@ const intf = '0.0.0.0'
 
 // MongoDB connection URI
 const mongoURI = 'mongodb://127.0.0.1:27017';
-const dbName = 'userDB';
+const dbName = 'AppDB';
 
 app.use(express.json());
 
