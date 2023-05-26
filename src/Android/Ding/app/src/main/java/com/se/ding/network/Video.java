@@ -1,27 +1,37 @@
 package com.se.ding.network;
 
 public class Video {
-    private String url;
-    private String dateTime;
+    private String id;
+    private String path;
+    private String datetime;
 
-    public Video(String url, String dateTime) {
-        this.url = url;
-        this.dateTime = dateTime;
+    public Video(String id, String path, String datetime) {
+        this.id = id;
+        this.path = path;
+        this.datetime = datetime;
     }
 
-    public String getUrl() {
-        return url;
+    public String getId() {
+        return id;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getDateTime() {
-        return dateTime;
+    public String getPath() {
+        return path;
     }
 
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getDatetime() {
+        return datetime;
+    }
+
+    public void setDatetime(String dateTime) {
+        this.datetime = datetime;
     }
 }

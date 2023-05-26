@@ -31,7 +31,7 @@
             android:hint="Server Address"
             android:minWidth="200dp"
             android:minHeight="70dp"
-            android:textColor="@color/palette_color4" />
+            android:textColor="@color/palette_color1" />
 
         <Button
             android:id="@+id/connect_button"
@@ -48,7 +48,7 @@
             android:hint="@string/username"
             android:minWidth="200dp"
             android:minHeight="70dp"
-            android:textColor="@color/palette_color4" />
+            android:textColor="@color/palette_color1" />
 
         <EditText
             android:id="@+id/password_edittext"
@@ -58,7 +58,7 @@
             android:inputType="textPassword"
             android:minWidth="200dp"
             android:minHeight="70dp"
-            android:textColor="@color/palette_color4" />
+            android:textColor="@color/palette_color1" />
 
         <Button
             android:id="@+id/login_button"

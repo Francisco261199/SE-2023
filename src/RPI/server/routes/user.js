@@ -8,9 +8,10 @@ const collectionName = 'users';
 var db = null;
 
 router.post('/new', (req, res) => {
-    const { name ,email, password } = req.body;
+    const { username ,email, password } = req.body;
+    console.log('New request received for user:', username, email, password);
     
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
       return res.status(400).json({ message: 'Missing parameters for user creation' });
     }
     
@@ -24,7 +25,7 @@ router.post('/new', (req, res) => {
         console.log("Database not running")
         return res.status(409).json({ message: 'User already exists' });
       }
-      const newUser = { name, email, password };
+      const newUser = { username, email, password };
 
       //Save user
       db.collection(collectionName).insertOne(newUser)
@@ -44,19 +45,23 @@ router.post('/new', (req, res) => {
 });
   
 router.post('/login', (req, res) => {
-    const { name, password } = req.body;
+    const { username, password } = req.body;
+    console.log('Login request received for user:', username, password);
     
-    if (!name || !password) {
+    if (!username || !password) {
+      console.log('Missing parameters for user creation')
       return res.status(400).json({ message: 'Missing parameters for user creation' });
     }
 
     if (!db) {
+      console.log('Database connection not established')
       return res.status(400).json({ status: 500, message: 'Database connection not established' });
     }
 
-    db.collection(collectionName).findOne({ name })
+    db.collection(collectionName).findOne({ username })
     .then(user => {
       if (!user || user.password !== password) {
+        console.log('Invalid credentials')
         return res.status(401).json({ message: 'Invalid credentials' });
       }
       res.json({ "token": token.generateAccessToken(user) });

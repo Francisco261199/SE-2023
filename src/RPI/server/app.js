@@ -3,9 +3,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
 
-var videoRouter = require('./routes/videos')
+var videoRouter = require('./routes/videos').router
 var userRouter = require('./routes/user').router
 var userDB = require('./routes/user')
+var videoDB = require('./routes/videos')
 
 var app = express();
 const port = 3000;
@@ -26,6 +27,7 @@ const connectToMongoDB = async () => {
     const db = client.db(dbName);
     // Pass the 'db' object to your route handlers or controllers as needed
     userDB.setDB(db);
+    videoDB.setDB(db);
   } catch (err) {
     console.error('Failed to connect to MongoDB:', err);
     process.exit(1); // Terminate the application if MongoDB connection fails

@@ -3,7 +3,6 @@ package com.se.ding;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.se.ding.network.Client;
 import com.se.ding.network.Video;
 
 import java.util.List;
@@ -42,10 +42,10 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Video videoItem = videoItems.get(position);
-        holder.buttonVideo.setText(videoItem.getDateTime());
+        holder.buttonVideo.setText(videoItem.getDatetime());
 
         // Set the video URL as the button's tag
-        holder.buttonVideo.setTag(videoItem.getUrl());
+        holder.buttonVideo.setTag(videoItem.getPath());
 
         // Check if the current item should be highlighted
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -94,7 +94,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             // Retrieve the video URL from the button's tag
-            String videoUrl = (String) buttonVideo.getTag();
+            String videoUrl = Client.getBaseURL() + "videos/" + (String) buttonVideo.getTag();;
 
             // Start a new activity to play the video
             Intent intent = new Intent(context, VideoPlayerActivity.class);
