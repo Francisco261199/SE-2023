@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const token = require('../controllers/auth')
+const bcrypt = require('bcrypt');
 var router = express.Router()
 
 const collectionName = 'users';
@@ -8,9 +9,10 @@ const collectionName = 'users';
 var db = null;
 
 router.post('/new', (req, res) => {
-    const { name ,email, password } = req.body;
+    const { username , email, password } = req.body;
+    console.log('New request received for user:', username, email, password);
     
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
       return res.status(400).json({ message: 'Missing parameters for user creation' });
     }
     
@@ -18,48 +20,72 @@ router.post('/new', (req, res) => {
       return res.status(500).json({ message: 'Database connection not established' });
     }
 
-    db.collection(collectionName).findOne({ email })
+    db.collection(collectionName).findOne({ $or: [{ username }, { email }] })
     .then(existingUser => {
       if (existingUser) {
-        console.log("Database not running")
+        console.log("User already exists")
         return res.status(409).json({ message: 'User already exists' });
       }
-      const newUser = { name, email, password };
 
-      //Save user
-      db.collection(collectionName).insertOne(newUser)
-        .then(() => {
-          // Generate an access token
-          res.json({ message: "User successfully created" });
-        })
-        .catch(err => {
-          console.error('Failed to create user:', err);
-          res.status(500).json({ message: 'Failed to create user' });
+      bcrypt.hash(password, 10, (err, hashedPassword) => {
+        if (err) {
+          console.error('Error hashing password:', err);
+          return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        // Create the user object with hashed password
+        const newUser = {
+          username,
+          email,
+          password: hashedPassword,
+        };
+      
+        //Save user
+        db.collection(collectionName).insertOne(newUser)
+          .then(() => {
+            return res.status(200).json({ message: "User successfully created" });
+          })
+          .catch(err => {
+            console.error('Failed to create user:', err);
+            return res.status(500).json({ message: 'Failed to create user' });
         });
+      });
     })
     .catch(err => {
-      console.error('Failed to check existing user:', err);
-      res.status(500).json({ message: 'Failed to create user' });
+      console.error('Error finding user: ', err);
+      return res.status(500).json({ message: 'Internal server error' });
     });
 });
   
 router.post('/login', (req, res) => {
-    const { name, password } = req.body;
+    const { username, password } = req.body;
+    console.log('Login request received for user:', username, password);
     
-    if (!name || !password) {
+    if (!username || !password) {
+      console.log('Missing parameters for user creation')
       return res.status(400).json({ message: 'Missing parameters for user creation' });
     }
 
     if (!db) {
-      return res.status(400).json({ status: 500, message: 'Database connection not established' });
+      console.log('Database connection not established')
+      return res.status(500).json({ message: 'Internal server error' });
     }
 
-    db.collection(collectionName).findOne({ name })
+    db.collection(collectionName).findOne({ username })
     .then(user => {
-      if (!user || user.password !== password) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-      res.json({ "token": token.generateAccessToken(user) });
+      bcrypt.compare(password, user.password, (err, match) => {
+        if (err) {
+          console.error('Error comparing passwords:', err);
+          return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        if (!user || !match){
+          console.log('Invalid credentials')
+          return res.status(401).json({ message: 'Invalid credentials' });
+        }
+
+        return res.json({ "token": token.generateAccessToken(user) });
+      });
     })
     .catch(err => {
       console.error('Failed to find user:', err);

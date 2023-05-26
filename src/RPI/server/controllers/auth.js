@@ -16,6 +16,7 @@ token.authenticateToken = (req, res) => {
   
     return jwt.verify(token, secretKey, (err) => {
       if (err) {
+        console.error('Invalid token:', err);
         return "Invalid token"
       }
   

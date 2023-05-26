@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
         mLogoutButton = findViewById(R.id.logout_button);
         mNotificationsButton = findViewById(R.id.notifications_button);
 
-        /*videoCatalog = findViewById(R.id.video_catalog);
+        videoCatalog = findViewById(R.id.video_catalog);
         videoCatalog.setLayoutManager(new GridLayoutManager(this, 1));
+        /*videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
@@ -77,10 +79,9 @@ public class MainActivity extends AppCompatActivity {
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
         videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
+        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));*/
         videoAdapter = new VideoAdapter(videoList, this);
-        videoCatalog.setAdapter(videoAdapter);*/
+        videoCatalog.setAdapter(videoAdapter);
 
         // Notify the adapter that a new item has been inserted
         /*videoAdapter.notifyItemInserted(videoList.size() - 1);
@@ -99,11 +100,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Video>> call, Response<List<Video>> response) {
                 if (response.isSuccessful()) {
-                    videoList = response.body();
+                    Log.d("WEB", "Videos received: " + response.body().toString());
+                    videoList.clear();
+                    videoList.addAll(response.body());
                     videoAdapter.notifyDataSetChanged();
                     // Display the video catalog
                 } else {
                     // Handle the error
+                    Log.d("WEB", "Video retrieval failed");
                 }
             }
 
@@ -111,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<List<Video>> call, Throwable t) {
                 // Handle the error
                 Toast.makeText(MainActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
+                Log.d("WEB", t.toString());
             }
         });
 
@@ -139,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<Video> call, Response<Video> response) {
                             if (response.isSuccessful()) {
-                                String url = response.body().getUrl();
+                                String url = Client.getBaseURL() + "videos/" + response.body().getPath();
                                 // Start a new activity to play the video
                                 Intent intent = new Intent(MainActivity.this, VideoPlayerActivity.class);
                                 intent.putExtra("videoUrl", url);

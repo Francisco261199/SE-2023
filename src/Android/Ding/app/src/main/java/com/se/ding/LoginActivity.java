@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -63,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         Button connectButton = findViewById(R.id.connect_button);
         connectButton.setOnClickListener(v -> {
             String address = serverAddress.getText().toString();
-            Client.setURL(address);
+            Client.setBaseURL(address);
         });
 
         mUsernameEditText = findViewById(R.id.username_edittext);
@@ -92,7 +91,8 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     } else {
-                        // Handle the error
+                        Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_SHORT).show();
+                        Log.d("WEB", String.valueOf(response.body()));
                     }
                 }
 
@@ -100,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onFailure(Call<AccessToken> call, Throwable t) {
                     // Handle the error
                     Toast.makeText(LoginActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
+                    Log.d("WEB", t.toString());
                 }
             });
         });
@@ -141,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
                                     dialog.dismiss();
                                 } else {
                                     // Handle the error
+                                    Log.d("WEB", "Response Fail");
                                 }
                             }
 
@@ -148,6 +150,7 @@ public class LoginActivity extends AppCompatActivity {
                             public void onFailure(Call<Void> call, Throwable t) {
                                 // Handle the error
                                 Toast.makeText(LoginActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
+                                Log.d("WEB", t.toString());
                             }
                         });
                     } else {
