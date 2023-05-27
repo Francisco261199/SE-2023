@@ -8,7 +8,7 @@ var db = null;
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-    credential: applicationDefault(),
+    credential: admin.credential.applicationDefault()
 });
 
 // Route to register a device
