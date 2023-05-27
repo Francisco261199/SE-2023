@@ -93,22 +93,22 @@ router.get('/:filename', (req, res) => {
     const filename = req.params.filename;
     //console.log("recordings folder: "+path.resolve(RECORDINGS_FOLDER))
 
-    return fs.readdir(path.resolve(RECORDINGS_FOLDER), (err, files) => {
+    fs.readdir(path.resolve(RECORDINGS_FOLDER), (err, files) => {
         if (err) {
             console.log("Error reading files:" + err)
-            return res.status(500).json({ message: 'Internal server error' })
-        }
-        
-        return files.forEach((file) => {
+            res.status(500).json({ message: 'Internal server error' })
+        } else {
+            files.forEach((file) => {
 
-            //filename is saved in the db without the extension(.mp4,.h264...) because of url purposes
-            if (file.includes(filename)) {
-              const videoPath = path.resolve(RECORDINGS_FOLDER + file);
-              console.log("path to file: " + videoPath)
-              // Serve the video file
-              return res.sendFile(path.resolve(videoPath));
-            }
-        });
+                //filename is saved in the db without the extension(.mp4,.h264...) because of url purposes
+                if (file.includes(filename)) {
+                  const videoPath = path.resolve(RECORDINGS_FOLDER + file);
+                  console.log("path to file: " + videoPath)
+                  // Serve the video file
+                res.sendFile(path.resolve(videoPath));
+                }
+            });
+        }
     });
 });
 
