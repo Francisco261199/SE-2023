@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.se.ding.network.AccessToken;
+import com.se.ding.network.Token;
 import com.se.ding.network.Client;
 import com.se.ding.network.LoginRequest;
 import com.se.ding.network.User;
@@ -30,15 +30,12 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
     private EditText mUsernameEditText;
     private EditText mPasswordEditText;
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();*/
 
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -50,11 +47,26 @@ public class LoginActivity extends AppCompatActivity {
                         }
 
                         // Get new FCM registration token
-                        String token = task.getResult();
+                        token = task.getResult();
                         Log.d("FCM", token);
                         Toast.makeText(LoginActivity.this, token, Toast.LENGTH_SHORT).show();
-                        //TextView testText = findViewById(R.id.textView);
-                        //testText.setText(token);
+                        Call<Void> call = Client.getService().registerDevice(new Token(token));
+                        call.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    Log.d("FCM", "Device Registered");
+                                } else {
+                                    Log.d("FCM", "Device Registration Failed");
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                // Handle the error
+                                Log.d("FCM", t.toString());
+                            }
+                        });
                     }
                 });
 
@@ -75,12 +87,12 @@ public class LoginActivity extends AppCompatActivity {
             String password = mPasswordEditText.getText().toString();
 
             LoginRequest loginRequest = new LoginRequest(username, password);
-            Call<AccessToken> call = Client.getService().login(loginRequest);
-            call.enqueue(new Callback<AccessToken>() {
+            Call<Token> call = Client.getService().login(loginRequest);
+            call.enqueue(new Callback<Token>() {
                 @Override
-                public void onResponse(Call<AccessToken> call, Response<AccessToken> response) {
+                public void onResponse(Call<Token> call, Response<Token> response) {
                     if (response.isSuccessful()) {
-                        AccessToken accessToken = response.body();
+                        Token accessToken = response.body();
                         // Save the access token for future requests
                         SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPref.edit();
@@ -97,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onFailure(Call<AccessToken> call, Throwable t) {
+                public void onFailure(Call<Token> call, Throwable t) {
                     // Handle the error
                     Toast.makeText(LoginActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
                     Log.d("WEB", t.toString());

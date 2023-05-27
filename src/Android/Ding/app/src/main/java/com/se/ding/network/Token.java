@@ -1,7 +1,11 @@
 package com.se.ding.network;
 
-public class AccessToken {
+public class Token {
     private String token;
+
+    public Token(String token) {
+        this.token = token;
+    }
 
     public String getToken() {
         return token;

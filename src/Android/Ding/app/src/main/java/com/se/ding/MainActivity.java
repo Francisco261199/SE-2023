@@ -2,26 +2,19 @@ package com.se.ding;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.se.ding.network.Client;
-import com.se.ding.network.Notification;
+import com.se.ding.network.Stream;
 import com.se.ding.network.Video;
 
 import java.util.ArrayList;
@@ -34,7 +27,6 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private Button mLiveButton;
     private Button mLogoutButton;
-    private Button mNotificationsButton;
     private RecyclerView videoCatalog;
     private VideoAdapter videoAdapter;
 
@@ -56,44 +48,11 @@ public class MainActivity extends AppCompatActivity {
 
         mLiveButton = findViewById(R.id.live_button);
         mLogoutButton = findViewById(R.id.logout_button);
-        mNotificationsButton = findViewById(R.id.notifications_button);
 
         videoCatalog = findViewById(R.id.video_catalog);
         videoCatalog.setLayoutManager(new GridLayoutManager(this, 1));
-        /*videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));
-        videoList.add(new Video("https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", "2023-05-18"));*/
         videoAdapter = new VideoAdapter(videoList, this);
         videoCatalog.setAdapter(videoAdapter);
-
-        // Notify the adapter that a new item has been inserted
-        /*videoAdapter.notifyItemInserted(videoList.size() - 1);
-        videoList.add(newVideo2);
-        videoAdapter.notifyItemInserted(videoList.size() - 1);*/
-
-        mNotificationsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDropdownMenu(v);
-            }
-        });
 
         Call<List<Video>> call = Client.getService().getVideoCatalog(accessToken);
         call.enqueue(new Callback<List<Video>>() {
@@ -139,23 +98,24 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
                 String accessToken = sharedPref.getString("access_token", null);
                 if (accessToken != null) {
-                    Call<Video> call = Client.getService().getCameraFeed(accessToken);
-                    call.enqueue(new Callback<Video>() {
+                    Call<Stream> call = Client.getService().startStream(accessToken);
+                    call.enqueue(new Callback<Stream>() {
                         @Override
-                        public void onResponse(Call<Video> call, Response<Video> response) {
+                        public void onResponse(Call<Stream> call, Response<Stream> response) {
                             if (response.isSuccessful()) {
-                                String url = Client.getBaseURL() + "videos/" + response.body().getPath();
+                                String url = "http://" + response.body().getHost() + ":" + response.body().getPort();
                                 // Start a new activity to play the video
                                 Intent intent = new Intent(MainActivity.this, VideoPlayerActivity.class);
                                 intent.putExtra("videoUrl", url);
+                                intent.putExtra("isStreaming", true);
                                 startActivity(intent);
                             } else {
-                                // Handle the error
+                                Toast.makeText(MainActivity.this, "Failed to start the stream", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
-                        public void onFailure(Call<Video> call, Throwable t) {
+                        public void onFailure(Call<Stream> call, Throwable t) {
                             // Handle the error
                             Toast.makeText(MainActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
                         }
@@ -163,46 +123,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // User needs to log in
                     Toast.makeText(MainActivity.this, "Login Required", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
                 }
             }
         });
-    }
-
-    private void showDropdownMenu(View anchorView) {
-        // Inflate the dropdown_menu layout
-        View contentView = getLayoutInflater().inflate(R.layout.notifications_layout, null);
-
-        // Create a new PopupWindow with the inflated layout
-        PopupWindow popupWindow = new PopupWindow(contentView,
-                700,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                true);
-
-        // Set the background drawable for the PopupWindow
-        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-        // Set the elevation for the PopupWindow
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            popupWindow.setElevation(8f);
-        }
-
-        // Find the RecyclerView in the dropdown_menu layout
-        RecyclerView recyclerView = contentView.findViewById(R.id.notifications_view);
-
-        // Create and set the adapter for the RecyclerView
-        List<Notification> notificationsList = new ArrayList<>();
-        notificationsList.add(new Notification("0", "2023-05-18"));
-        notificationsList.add(new Notification("1", "2023-05-20"));
-        NotificationAdapter videoAdapter = new NotificationAdapter(notificationsList, videoCatalog); // Replace videoList with your actual list of videos
-        recyclerView.setAdapter(videoAdapter);
-
-        // Set the layout manager for the RecyclerView (e.g., LinearLayoutManager)
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Show the PopupWindow below the anchor view
-        popupWindow.showAsDropDown(anchorView);
     }
 }

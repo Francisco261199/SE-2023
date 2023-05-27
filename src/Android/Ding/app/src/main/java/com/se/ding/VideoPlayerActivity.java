@@ -2,8 +2,12 @@ package com.se.ding;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -12,15 +16,23 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.se.ding.network.Client;
+import com.se.ding.network.Stream;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class VideoPlayerActivity extends AppCompatActivity {
     private PlayerView playerView;
     private SimpleExoPlayer player;
+    private Boolean isStreaming = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
+        isStreaming = getIntent().getExtras().getBoolean("isStreaming");
 
         playerView = findViewById(R.id.player_view);
     }
@@ -41,6 +53,22 @@ public class VideoPlayerActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         releasePlayer();
+        if(isStreaming) {
+            SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
+            String accessToken = sharedPref.getString("access_token", null);
+            if (accessToken != null) {
+                Call<Void> call = Client.getService().stopStream(accessToken);
+                call.enqueue(new Callback<Void>() {
+                    @Override
+                    public void onResponse(Call<Void> call, Response<Void> response) {
+                    }
+
+                    @Override
+                    public void onFailure(Call<Void> call, Throwable t) {
+                    }
+                });
+            }
+        }
     }
 
     private void initializePlayer() {

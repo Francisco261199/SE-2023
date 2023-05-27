@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@color/palette_color3">
+    android:background="@drawable/login_shape">
 
     <TextView
         android:layout_width="match_parent"
@@ -14,7 +14,7 @@
         android:textSize="28sp"
         android:textStyle="bold"
         android:textAlignment="center"
-        android:textColor="@color/palette_color4"
+        android:textColor="@color/palette_color1"
         android:gravity="center_horizontal" />
 
     <EditText
@@ -24,7 +24,7 @@
         android:hint="@string/username"
         android:minWidth="200dp"
         android:minHeight="70dp"
-        android:textColor="@color/palette_color4" />
+        android:textColor="@color/palette_color1" />
 
     <EditText
         android:id="@+id/email_edittext"
@@ -33,7 +33,7 @@
         android:hint="@string/email"
         android:minWidth="200dp"
         android:minHeight="70dp"
-        android:textColor="@color/palette_color4" />
+        android:textColor="@color/palette_color1" />
 
     <EditText
         android:id="@+id/password_edittext"
@@ -43,7 +43,7 @@
         android:inputType="textPassword"
         android:minWidth="200dp"
         android:minHeight="70dp"
-        android:textColor="@color/palette_color4" />
+        android:textColor="@color/palette_color1" />
 
     <EditText
         android:id="@+id/confirm_password_edittext"
@@ -53,14 +53,14 @@
         android:inputType="textPassword"
         android:minWidth="200dp"
         android:minHeight="70dp"
-        android:textColor="@color/palette_color4" />
+        android:textColor="@color/palette_color1" />
 
     <Button
         android:id="@+id/register_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/register"
-        android:textColor="@color/palette_color4"
-        app:backgroundTint="@color/palette_color1" />
+        android:textColor="@color/palette_color1"
+        app:backgroundTint="@color/palette_color2" />
 
 </LinearLayout>
