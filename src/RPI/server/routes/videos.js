@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
         return res.status(500).json({ status: 500, message: 'Internal server error' });
     }
     // Exemplo de inserção:
-    // db.collection(collectionName).insertOne({"path": RECORDINGS_FOLDER+"recording20230523_213717", "datetime": "20230524_112521"})
+    // db.collection(collectionName).insertOne({"path": "recording20230523_213717", "datetime": "20230524_112521"})
 
     try {
         const videos = await db.collection(collectionName).find().toArray();
@@ -72,7 +72,7 @@ router.get('/delete', async (req, res) => {
             if (!videoData) {
                 console.log("Error deleting file with id:" + videoId)
             } else {
-                fs.unlink(videoData.path, (err) => {
+                fs.unlink(RECORDINGS_FOLDER+videoData.path, (err) => {
                     if (err) {
                         console.log("Error deleting file")
                     }
