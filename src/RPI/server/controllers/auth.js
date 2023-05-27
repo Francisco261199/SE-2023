@@ -6,8 +6,9 @@ const secretKey = 'secret';
 var token = {}
 
 token.authenticateToken = (req, res) => {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
+    //const authHeader = req.headers.authorization;
+    //const token = authHeader && authHeader.split(' ')[1];
+    const token = req.headers.authorization;
   
     if (!token) {
       console.log("token:"+req.headers.toString())

@@ -6,8 +6,10 @@ const { MongoClient } = require('mongodb');
 var videoRouter = require('./routes/videos').router
 var streamRouter = require('./routes/stream').router
 var userRouter = require('./routes/user').router
+var notificationRouter = require('./routes/notification').router
 var userDB = require('./routes/user')
 var videoDB = require('./routes/videos')
+var notificationDB = require('./routes/notification')
 var streamObj = require('./routes/stream')
 
 var app = express();
@@ -37,6 +39,7 @@ const connectToMongoDB = async () => {
     // Pass the 'db' object to your route handlers or controllers as needed
     userDB.setDB(db);
     videoDB.setDB(db);
+    notificationDB.setDB(db);
     streamObj.setHandlerObj(initHandlerObj)
   } catch (err) {
     console.error('Failed to connect to MongoDB:', err);
@@ -54,6 +57,7 @@ connectToMongoDB().then(() => {
   app.use('/user', userRouter)
   app.use('/videos', videoRouter)
   app.use('/stream', streamRouter)
+  app.use('/notifications', notificationRouter)
 
   app.use('/isAlive', function(req, res, next){
     res.status(200).send("Running")

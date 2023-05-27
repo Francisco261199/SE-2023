@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
+const { ObjectId } = require('mongodb');
 const bodyParser = require('body-parser');
 const token = require('../controllers/auth');
 
@@ -23,7 +24,7 @@ router.get('/', async (req, res) => {
         return res.status(500).json({ status: 500, message: 'Internal server error' });
     }
     // Exemplo de inserção:
-    // db.collection(collectionName).insertOne({"path": "example", "datetime": "2013-01-01T00:00:00"})
+    //db.collection(collectionName).insertOne({"path": "example", "datetime": "2013-01-01T00:00:00"})
 
     try {
         const videos = await db.collection(collectionName).find().toArray();
@@ -38,39 +39,60 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-    
-router.get('/:filename', (req, res) => {
 
-    response = token.authenticateToken(req,res)
+router.get('/delete', async (req, res) => {
+    response = token.authenticateToken(req, res)
     if (response !== "User validated") {
         console.log(response)
         return res.status(400).json({ message: response })
     }
+
+    if (!db) {
+        console.log('Database connection not established')
+        return res.status(500).json({ status: 500, message: 'Internal server error' });
+    }
+
+    const videoId = req.query.videoId;
+
+    try {
+        const result = await db.collection('videos').deleteOne({ _id: new ObjectId(videoId) });
+
+        if (result.deletedCount === 1) {
+          // TODO: 
+          // Remover o ficheiro
+
+          res.json({ message: 'Video deleted successfully' });
+        } else {
+          res.status(404).json({ message: 'Video not found' });
+        }
+    } catch (err) {
+        console.error('Error deleting video:', err);
+        res.status(500).json({ message: 'Failed to delete video' });
+    }
+});
+    
+router.get('/:filename', (req, res) => {
+
+    /*response = token.authenticateToken(req,res)
+    if (response !== "User validated") {
+        console.log(response)
+        return res.status(400).json({ message: response })
+    }*/
     
     const filename = req.params.filename;
     
     fs.readdir(RECORDINGS_FOLDER, (err, files) => {
-      if (err) {
-        console.error('Error reading folder:', err);
-        return res.status(500).json({ status: 500, message: 'Internal server error' });
-      }
 
       files.forEach((file) => {
-        if (file == nil) {
-          console.log("No files exist in: " + RECORDINGS_FOLDER)
-          return res.status(500).json({ status: 500, message: 'Internal server error' });
-        }
 
         //filename is saved in the db without the extension(.mp4,.h264...) because of url purposes
         if (file.includes(filename)) {
-
+          const videoPath = RECORDINGS_FOLDER + file;
           // Serve the video file
-          return res.sendFile(path.resolve(videoPath));
+          res.sendFile(path.resolve(videoPath));
         }
       });
     });
-
-    return res.status(404).json({ message: "File not found" })
 });
 
 module.exports = {
