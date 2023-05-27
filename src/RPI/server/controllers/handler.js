@@ -1,35 +1,55 @@
 const { spawn } = require('child_process')
-var nviewers = 0
 
-module.exports.initStream = function (handlerObj){
+module.exports.initStream = function (handlerObj, port){
     if(handlerObj != null) {
         if( !handlerObj.streamON ) {
             console.log("Init Stream")
-            handlerObj.stream = spawn('python3', ['./test.py'])
+            handlerObj.stream = spawn('python3', ['../../scripts/stream.py', port])
             handlerObj.streamON = true
 
             handlerObj.stream.stdout.once('data', async () => {
+                console.log("Stream has started at port:" + port)
             })
 
-            handlerObj.stream.on('close', () =>{
-                console.log("stream terminated")
-            })
-            nviewers++
+            // handlerObj.stream.on('close', () =>{
+            //     console.log("Stream terminated")
+            //     handlerObj.streamON = false
+            //     handlerObj.stream.kill() 
+            //     handlerObj.stream = null
+            //     handlerObj.nviewers = 0
+            // })
+
+            handlerObj.nviewers++
+            console.log("Viewer count: "+ handlerObj.nviewers)
+            return "Stream started"
+
         } else if ( handlerObj.streamON ) {
-            nviewers++
+            handlerObj.nviewers++
+            console.log("Viewer count: "+ handlerObj.nviewers)
+            return "Stream already running"
         }
-
     }
+
+    console.log("handlerObj is null")
+    return "Error starting stream"
 }
+
 module.exports.stopStream = function (handlerObj){
     if(handlerObj != null) {
-        if( handlerObj.streamON && nviewers == 1 ) {
-            console.log("Stop Stream")
+        if( handlerObj.streamON && handlerObj.nviewers == 1 ) {
             handlerObj.stream.kill()
+            handlerObj.stream = null
             handlerObj.streamON = false
-            nviewers = 0
-        } else if ( handlerObj.streamON && nviewers >= 1 ) {
-            nviewers--
+            handlerObj.nviewers = 0
+            console.log("Stream stopped")
+            return "Stream stopped"
+
+        } else if ( handlerObj.streamON && handlerObj.nviewers > 1 ) {
+            handlerObj.nviewers--
+            console.log("Viewer count: "+ handlerObj.nviewers)
+            return "Stream stopped for user"
         }
     }
+    console.log("handlerObj is null")
+    return "Error stopping stream"
 }

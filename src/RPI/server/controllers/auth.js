@@ -6,22 +6,21 @@ const secretKey = 'secret';
 var token = {}
 
 token.authenticateToken = (req, res) => {
-    const authHeader = req.headers.authorization; //['Authorization'];
+    const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(' ')[1];
   
     if (!token) {
       console.log("token:"+req.headers.toString())
-      return res.status(401).json({ message: "Missing token" });
+      return "Missing token"
     }
   
-    jwt.verify(token, secretKey, (err, user) => {
+    return jwt.verify(token, secretKey, (err) => {
       if (err) {
         console.error('Invalid token:', err);
-        return res.status(403).json({ message: "Invalid token" });
+        return "Invalid token"
       }
   
-      req.user = user;
-      return token
+      return "User validated"
     });
 }
 
