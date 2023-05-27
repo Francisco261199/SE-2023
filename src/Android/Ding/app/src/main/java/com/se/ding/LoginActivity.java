@@ -73,8 +73,42 @@ public class LoginActivity extends AppCompatActivity {
         EditText serverAddress = findViewById(R.id.server_edittext);
         Button connectButton = findViewById(R.id.connect_button);
         connectButton.setOnClickListener(v -> {
+            Log.d("WEB", "Before: " + Client.getBaseURL());
             String address = serverAddress.getText().toString();
             Client.setBaseURL(address);
+            Log.d("WEB", "After: " + Client.getBaseURL());
+            FirebaseMessaging.getInstance().getToken()
+                    .addOnCompleteListener(new OnCompleteListener<String>() {
+                        @Override
+                        public void onComplete(@NonNull Task<String> task) {
+                            if (!task.isSuccessful()) {
+                                Log.w("FCM", "Fetching FCM registration token failed", task.getException());
+                                return;
+                            }
+
+                            // Get new FCM registration token
+                            token = task.getResult();
+                            Log.d("FCM", token);
+                            Toast.makeText(LoginActivity.this, token, Toast.LENGTH_SHORT).show();
+                            Call<Void> call = Client.getService().registerDevice(new Token(token));
+                            call.enqueue(new Callback<Void>() {
+                                @Override
+                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                    if (response.isSuccessful()) {
+                                        Log.d("FCM", "Device Registered");
+                                    } else {
+                                        Log.d("FCM", "Device Registration Failed");
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<Void> call, Throwable t) {
+                                    // Handle the error
+                                    Log.d("FCM", t.toString());
+                                }
+                            });
+                        }
+                    });
         });
 
         mUsernameEditText = findViewById(R.id.username_edittext);
