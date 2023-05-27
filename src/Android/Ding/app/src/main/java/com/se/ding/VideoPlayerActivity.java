@@ -74,12 +74,14 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private void initializePlayer() {
         // Create a new ExoPlayer instance
         player = new SimpleExoPlayer.Builder(this).build();
+        Toast.makeText(this, "Player Initialized", Toast.LENGTH_SHORT).show();
 
         // Attach the player to the player view
         playerView.setPlayer(player);
 
         // Create a media source pointing to the video URL
         Uri videoUri = Uri.parse(getIntent().getStringExtra("videoUrl"));
+        Toast.makeText(this, "Video URL: " + videoUri, Toast.LENGTH_SHORT).show();
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
                 Util.getUserAgent(this, getString(R.string.app_name)));
         MediaSource mediaSource = new ProgressiveMediaSource.Factory(dataSourceFactory)
@@ -92,6 +94,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     }
 
     private void releasePlayer() {
+        Toast.makeText(this, "Releasing player...", Toast.LENGTH_SHORT).show();
         if (player != null) {
             player.release();
             player = null;
