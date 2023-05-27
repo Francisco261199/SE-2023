@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 
 var router = express.Router()
 var token = require('../controllers/auth');
-var handler = require('../controllers/handler')
+var handler = require('../controllers/handler_stream')
 var handlerObj = {};
 
 const DEFAULT_STREAM_PORT = "10001"

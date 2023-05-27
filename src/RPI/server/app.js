@@ -16,10 +16,10 @@ var app = express();
 
 var initHandlerObj = {
   streamON: false,
-  recON: false,
   stream: null,
   nviewers: 0
 }
+
 const port = 3000;
 const intf = '0.0.0.0'
 
