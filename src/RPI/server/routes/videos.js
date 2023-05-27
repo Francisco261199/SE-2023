@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
         return res.status(500).json({ status: 500, message: 'Internal server error' });
     }
     // Exemplo de inserção:
-    //db.collection(collectionName).insertOne({"path": "example", "datetime": "2013-01-01T00:00:00"})
+    // db.collection(collectionName).insertOne({"path": RECORDINGS_FOLDER+"recording20230523_213717", "datetime": "20230524_112521"})
 
     try {
         const videos = await db.collection(collectionName).find().toArray();
@@ -33,6 +33,7 @@ router.get('/', async (req, res) => {
           "path": video.path,
           "datetime": video.datetime
         }));
+        console.log(JSON.stringify(formattedVideos))
         res.json(formattedVideos);
     } catch (err) {
         console.error('Failed to fetch videos:', err);
@@ -55,15 +56,32 @@ router.get('/delete', async (req, res) => {
     const videoId = req.query.videoId;
 
     try {
+
         const result = await db.collection('videos').deleteOne({ _id: new ObjectId(videoId) });
 
         if (result.deletedCount === 1) {
-          // TODO: 
-          // Remover o ficheiro
+            
+            const videos = await db.collection(collectionName).find().toArray();
+            const formattedVideos = videos.map(video => ({
+                "id": video._id,
+                "path": video.path,
+                "datetime": video.datetime
+            }));
 
-          res.json({ message: 'Video deleted successfully' });
+            const videoData = formattedVideos.find(video => video.id === videoId)
+            if (!videoData) {
+                console.log("Error deleting file with id:" + videoId)
+            } else {
+                fs.unlink(videoData.path, (err) => {
+                    if (err) {
+                        console.log("Error deleting file")
+                    }
+                });
+            }
+
+            res.json({ message: 'Video deleted successfully' });    
         } else {
-          res.status(404).json({ message: 'Video not found' });
+            res.status(404).json({ message: 'Video not found' });
         }
     } catch (err) {
         console.error('Error deleting video:', err);
@@ -73,11 +91,11 @@ router.get('/delete', async (req, res) => {
     
 router.get('/:filename', (req, res) => {
 
-    /*response = token.authenticateToken(req,res)
+    response = token.authenticateToken(req,res)
     if (response !== "User validated") {
         console.log(response)
         return res.status(400).json({ message: response })
-    }*/
+    }
     
     const filename = req.params.filename;
     
