@@ -6,9 +6,8 @@ const secretKey = 'secret';
 var token = {}
 
 token.authenticateToken = (req, res) => {
-    //const authHeader = req.headers.authorization;
-    //const token = authHeader && authHeader.split(' ')[1];
-    const token = req.headers.authorization;
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
   
     if (!token) {
       console.log("token:"+req.headers.toString())
@@ -17,7 +16,7 @@ token.authenticateToken = (req, res) => {
   
     return jwt.verify(token, secretKey, (err) => {
       if (err) {
-        console.error('Invalid token:', err);
+        console.error('Invalid token');
         return "Invalid token"
       }
   

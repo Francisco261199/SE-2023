@@ -1,5 +1,6 @@
 const express = require('express');
 const admin = require('firebase-admin');
+require('dotenv').config({path: '../.env'})
 var router = express.Router()
 
 const collectionName = 'devices';
@@ -15,7 +16,7 @@ admin.initializeApp({
 router.post('/registerDevice', async (req, res) => {
     if (!db) {
         console.error('Database connection not established');
-        return res.status(500).json({ message: 'Database connection not established' });
+        return res.status(500).json({ message: 'Internal server error' });
     }
     try {
         // Get the registration token from the request body
@@ -36,7 +37,7 @@ router.post('/registerDevice', async (req, res) => {
         }
 
         console.error('Error registering device:', error);
-        res.status(500).json({ message: 'Failed to register device' });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
