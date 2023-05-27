@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         videoAdapter = new VideoAdapter(videoList, this);
         videoCatalog.setAdapter(videoAdapter);
 
-        Call<List<Video>> call = Client.getService().getVideoCatalog(accessToken);
+        Call<List<Video>> call = Client.getService().getVideoCatalog("Bearer " + accessToken);
         call.enqueue(new Callback<List<Video>>() {
             @Override
             public void onResponse(Call<List<Video>> call, Response<List<Video>> response) {
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
                 String accessToken = sharedPref.getString("access_token", null);
                 if (accessToken != null) {
-                    Call<Stream> call = Client.getService().startStream(accessToken);
+                    Call<Stream> call = Client.getService().startStream("Bearer " + accessToken);
                     call.enqueue(new Callback<Stream>() {
                         @Override
                         public void onResponse(Call<Stream> call, Response<Stream> response) {

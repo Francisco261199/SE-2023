@@ -57,7 +57,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
             SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
             String accessToken = sharedPref.getString("access_token", null);
             if (accessToken != null) {
-                Call<Void> call = Client.getService().stopStream(accessToken);
+                Call<Void> call = Client.getService().stopStream("Bearer " + accessToken);
                 call.enqueue(new Callback<Void>() {
                     @Override
                     public void onResponse(Call<Void> call, Response<Void> response) {

@@ -107,7 +107,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                     // User needs to log in
                     Toast.makeText(context, "Authentication Failed", Toast.LENGTH_SHORT).show();
                 } else {
-                    Call<Void> call = Client.getService().deleteVideo(accessToken, videoId);
+                    Call<Void> call = Client.getService().deleteVideo("Bearer " + accessToken, videoId);
                     call.enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
