@@ -7,9 +7,8 @@ const collectionName = 'devices';
 var db = null;
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('./ding-7f8f0-firebase-adminsdk-vsluo-dbe068958d.json');
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: applicationDefault(),
 });
 
 // Route to register a device
