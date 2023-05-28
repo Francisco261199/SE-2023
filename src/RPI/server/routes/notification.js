@@ -59,7 +59,8 @@ router.get('/notify', (req, res) => {
 // Function to send a general notification to all devices
 const sendNotification = async (title, body) => {
     if (!db) {
-        return res.status(500).json({ message: 'Database connection not established' });
+        console.log("Could connect to devices' database")
+        return res.status(500).json({ message: 'Internal server error' });
     }
     try {
         const devicesCollection = db.collection(collectionName);
@@ -90,6 +91,7 @@ const sendNotification = async (title, body) => {
 
 module.exports = {
     router,
+    sendNotification,
     setDB: function (database) {
         db = database;
     }

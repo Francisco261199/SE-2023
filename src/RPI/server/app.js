@@ -11,13 +11,21 @@ var userDB = require('./routes/user')
 var videoDB = require('./routes/videos')
 var notificationDB = require('./routes/notification')
 var streamObj = require('./routes/stream')
+var recordings = require('./routes/recordings');
 
 var app = express();
 
-var initHandlerObj = {
+var initStreamHandlerObj = {
   streamON: false,
   stream: null,
   nviewers: 0
+}
+
+var initRecHandlerObj = {
+  RecON: false,
+  rec: null,
+  intervalId: null,
+  startTime: 0
 }
 
 const port = 3000;
@@ -40,7 +48,7 @@ const connectToMongoDB = async () => {
     userDB.setDB(db);
     videoDB.setDB(db);
     notificationDB.setDB(db);
-    streamObj.setHandlerObj(initHandlerObj)
+    streamObj.setHandlerObj(initStreamHandlerObj)
   } catch (err) {
     console.error('Failed to connect to MongoDB:', err);
     process.exit(1); // Terminate the application if MongoDB connection fails
@@ -71,4 +79,5 @@ connectToMongoDB().then(() => {
     console.log(`Server listening on port ${port}`);
   });
   
+  recordings.runRecordingHandler(initRecHandlerObj);
 });
