@@ -31,13 +31,13 @@ function runRecordingHandler(handlerObj) {
                         handlerObj.RecON = false
                         handlerObj.Rec = null
                         handlerObj.startTime = 0
-                        //turn off led
+                        _ = spawn('python3', '../../scripts/sendearduino.py', '0')
                     }
                 }, 5000)
                 handlerObj.intervalId = interval
                 handler.initRec(handlerObj)
                 notification.sendNotification("Sensor Sensor Sensor!", "Movement was detected in your doorbell!")
-                //turn on LED
+                _ = spawn('python3', '../../scripts/sendearduino.py', '1')
             } else if (output === 'ring') {
                 if (handlerObj.intervalId == null) {
                     const interval = setInterval(() => {
@@ -49,15 +49,18 @@ function runRecordingHandler(handlerObj) {
                             handlerObj.RecON = false
                             handlerObj.Rec = null
                             handlerObj.startTime = 0
+                            _ = spawn('python3', '../../scripts/sendearduino.py', '0')
                         }
                     }, 5000)
                     handlerObj.intervalId = interval
                 }
                 console.log("Receiving ring data")
                 handler.initRec(handlerObj)
+                _ = spawn('python3', '../../scripts/sendearduino.py', '1')
                 notification.sendNotification("Ding Ding Ding!", "Looks like someone rung your doorbell!")
             }
         }
+        console.log("Error: handlerObj is null")
     });
 }
 
