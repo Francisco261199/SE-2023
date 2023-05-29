@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include "song.h"
 
 #define SLAVE_ADDRESS 0x42 // Replace with desired I2C slave address
 
@@ -21,6 +22,19 @@ bool objectDetected = false;
 bool isBuzzerOn = false;
 const int proximityThreshold = 50; // Threshold distance in centimeters
 unsigned long startTime = 0;
+
+void playMelody(int pin) {
+  for (unsigned int i = 0; i < sizeof(melody) / sizeof(melody[0]); i++) {
+    int noteDuration = 1000 / noteDurations[i];
+    tone(pin, melody[i], noteDuration);
+    delay(noteDuration * 1.30); // Add a slight pause between notes
+    noTone(pin);
+    
+    if(digitalRead(buttonPin) == LOW) {
+      break;
+    }
+  }
+}
 
 void requestEvent() {
   // Handle the request for data from the master
@@ -80,8 +94,10 @@ void loop() {
     delay(250);
 
     // Turn on the buzzer
-    tone(buzzerPin, lowFrequency);
+    //tone(buzzerPin, lowFrequency);
     buttonPressed = true;
+
+    playMelody(buzzerPin);
 
     // Print button press action to Serial Monitor
     Serial.println("Button Pressed: Buzzer On");
