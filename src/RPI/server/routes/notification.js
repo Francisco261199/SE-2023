@@ -68,7 +68,7 @@ const sendNotification = async (title, body) => {
         // Get all devices from the collection
         const devices = await devicesCollection.find().toArray();
         const registrationTokens = devices.map((device) => device.token);
-        console.log('Devices:', registrationTokens);
+        //console.log('Devices:', registrationTokens);
 
         // Create notification message
         const message = {
@@ -83,7 +83,7 @@ const sendNotification = async (title, body) => {
         const response = await admin.messaging().sendMulticast(message);
 
         // Handle response as needed
-        console.log('Notification sent to all devices:', response);
+        // console.log('Notification sent to all devices:', response);
     } catch (error) {
         console.error('Error sending notification to all devices:', error);
     }

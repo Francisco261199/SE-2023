@@ -4,7 +4,7 @@ import datetime
 from picamera2 import Picamera2
 from picamera2.encoders import H264Encoder
 
-OUTPUT_FOLDER = '~/camera/SE-2023/src/RPI/multimedia/'
+OUTPUT_FOLDER = '/home/camera/camera/SE-2023/src/RPI/multimedia/'
 MAX_DURATION_RECORDING = 60 * 15 #15min; to prevent storage from getting full
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)

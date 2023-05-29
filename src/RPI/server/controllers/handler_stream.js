@@ -4,20 +4,23 @@ module.exports.initStream = function (handlerObj, port){
     if(handlerObj != null) {
         if( !handlerObj.streamON ) {
             console.log("Init Stream")
-            handlerObj.stream = spawn('python3', ['../../scripts/stream.py', port])
+            handlerObj.stream = spawn('python3', ['/home/camera/camera/SE-2023/src/RPI/scripts/stream.py', port])
             handlerObj.streamON = true
 
             handlerObj.stream.stdout.once('data', async () => {
                 console.log("Stream has started at port:" + port)
             })
 
-            // handlerObj.stream.on('close', () =>{
-            //     console.log("Stream terminated")
-            //     handlerObj.streamON = false
-            //     handlerObj.stream.kill() 
-            //     handlerObj.stream = null
-            //     handlerObj.nviewers = 0
-            // })
+            handlerObj.stream.on('error', (error) => {
+                console.error('An error occurred while spawning the process:', error);
+            });
+
+            handlerObj.stream.on('close', (error) =>{
+                console.log("Stream terminated: "+error)
+                handlerObj.streamON = false
+                handlerObj.stream = null
+                handlerObj.nviewers = 0
+            })
 
             handlerObj.nviewers++
             console.log("Viewer count: "+ handlerObj.nviewers)
