@@ -7,7 +7,8 @@ const bodyParser = require('body-parser');
 var router = express.Router()
 var token = require('../controllers/auth');
 var handler = require('../controllers/handler_stream')
-var handlerObj = {};
+var handlerObj = null;
+var recHandlerObj = null;
 
 const DEFAULT_STREAM_PORT = "10001"
 const DEFAULT_HOST_INTF = os.networkInterfaces()["wlan0"]
@@ -25,6 +26,15 @@ router.get('/start', async (req, res) => {
         console.log("Couldn't retrieve interface data")
         return res.status(500).json({ message: 'Internal server error' });
     }
+
+    //Kill recording to prioritize live streaming
+    if ( recHandlerObj.Rec != null ) {
+        recHandlerObj.Rec.kill()
+    }
+    recHandlerObj.Rec = null
+    recHandlerObj.startTime = 0
+    clearInterval(recHandlerObj.intervalId)
+    recHandlerObj.intervalId = null
     
     let resp = handler.initStream(handlerObj, DEFAULT_STREAM_PORT)
     if (resp === "Error starting stream") {
@@ -62,7 +72,10 @@ router.get('/stop', async (req, res) => {
 
 module.exports = {
     router,
-    setHandlerObj: function(inithandlerObj) {
-        handlerObj = inithandlerObj;
+    setHandlerObj: function(initHandlerObj) {
+        handlerObj = initHandlerObj;
+    },
+    setRecHandlerObj: function(initRecHandlerObj) {
+        recHandlerObj = initRecHandlerObj;
     }
 }

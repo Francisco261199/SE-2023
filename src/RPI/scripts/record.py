@@ -13,6 +13,7 @@ video_id = "recording"+current_time+".h264"
 
 picam2 = Picamera2()
 video_config = picam2.create_video_configuration({"size": (1280, 720)})
+picam2.set_controls({"FrameRate": 10}) #STOP-MOTION
 picam2.configure(video_config)
 
 picam2.start_and_record_video(OUTPUT_FOLDER+video_id, duration=MAX_DURATION_RECORDING)

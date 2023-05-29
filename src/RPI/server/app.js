@@ -23,7 +23,7 @@ var initStreamHandlerObj = {
 
 var initRecHandlerObj = {
   RecON: false,
-  rec: null,
+  Rec: null,
   intervalId: null,
   startTime: 0
 }
@@ -49,6 +49,8 @@ const connectToMongoDB = async () => {
     videoDB.setDB(db);
     notificationDB.setDB(db);
     streamObj.setHandlerObj(initStreamHandlerObj)
+    streamObj.setRecHandlerObj(initRecHandlerObj)
+    recordings.setStreamObj(initStreamHandlerObj)
   } catch (err) {
     console.error('Failed to connect to MongoDB:', err);
     process.exit(1); // Terminate the application if MongoDB connection fails
