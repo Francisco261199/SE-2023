@@ -12,6 +12,51 @@ var handlerObj = {};
 const DEFAULT_STREAM_PORT = "10001"
 const DEFAULT_HOST_INTF = os.networkInterfaces()["wlan0"]
 
+// Endpoint to stream camera feed
+router.get('/', (req, res) => {
+    // Set appropriate headers for image streaming
+    res.writeHead(200, {
+        'Content-Type': 'image/jpeg',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'no-cache',
+        'Transfer-Encoding': 'chunked'
+    });
+
+    // Create a new RaspiCam instance for the current request
+    const camera = new RaspiCam({
+        mode: 'photo',
+        output: '-',
+        encoding: 'jpg',
+        width: 640,
+        height: 480,
+        quality: 75,
+        timeout: 0
+    });
+
+    // Start capturing the camera feed for the current request
+    camera.start();
+
+    // When an image is captured, send it to the client
+    camera.on('read', (data) => {
+        res.write(data, 'binary');
+    });
+
+    // Handle any errors for the current request, if needed
+    camera.on('error', (error) => {
+        console.error(`Camera error: ${error}`);
+    });
+
+    // Handle the camera close event for the current request
+    camera.on('stop', () => {
+        res.end();
+    });
+
+    // Stop capturing the camera feed when the client disconnects
+    res.on('close', () => {
+        camera.stop();
+    });
+});
+
 router.get('/start', async (req, res) => {
     
     response = token.authenticateToken(req,res)
