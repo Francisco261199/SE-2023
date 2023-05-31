@@ -10,7 +10,7 @@ var handler = require('../controllers/handler_stream')
 var handlerObj = null;
 var recHandlerObj = null;
 
-const DEFAULT_STREAM_PORT = "10001"
+const DEFAULT_STREAM_PORT = "8554"
 const DEFAULT_HOST_INTF = os.networkInterfaces()["wlan0"]
 
 router.get('/start', async (req, res) => {

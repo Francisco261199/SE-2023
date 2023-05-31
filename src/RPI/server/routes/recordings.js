@@ -25,9 +25,12 @@ function runRecordingHandler(handlerObj) {
                         console.log("Refresh recording timer")
                         clearInterval(handlerObj.intervalId)
                     }
-
+                    if (!handlerObj.RecON) {
+                        // send notification if not recording
+                        notification.sendNotification("Alert!", "Movement was detected in your doorbell!")
+                    }
                     handler.initRec(handlerObj)
-                    notification.sendNotification("Sensor Sensor Sensor!", "Movement was detected in your doorbell!")
+                    //notification.sendNotification("Sensor Sensor Sensor!", "Movement was detected in your doorbell!")
 
                 } else if (output === 'ring') {
                     handler.initRec(handlerObj)

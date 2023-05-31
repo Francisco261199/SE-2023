@@ -4,7 +4,7 @@ module.exports.initStream = function (handlerObj, port){
     if(handlerObj != null) {
         if( !handlerObj.streamON ) {
             console.log("Init Stream")
-            handlerObj.stream = spawn('python3', ['/home/camera/camera/SE-2023/src/RPI/scripts/stream.py', port])
+            handlerObj.stream = spawn('python3', ['/home/camera/camera/SE-2023/src/RPI/scripts/streamOn.py'])
             handlerObj.streamON = true
 
             handlerObj.stream.stdout.once('data', async () => {
@@ -15,12 +15,13 @@ module.exports.initStream = function (handlerObj, port){
                 console.error('An error occurred while spawning the process:', error);
             });
 
-            handlerObj.stream.on('close', (error) =>{
-                console.log("Stream terminated: "+error)
-                handlerObj.streamON = false
-                handlerObj.stream = null
-                handlerObj.nviewers = 0
-            })
+            //handlerObj.stream.on('close', (error) =>{
+            //    console.log("Stream terminated: "+error)
+            //    handlerObj.streamON = false
+            //    //handlerObj.stream.kill()
+            //    handlerObj.stream = null
+            //    handlerObj.nviewers = 0
+            //})
 
             handlerObj.nviewers++
             console.log("Viewer count: "+ handlerObj.nviewers)
@@ -40,9 +41,10 @@ module.exports.initStream = function (handlerObj, port){
 module.exports.stopStream = function (handlerObj){
     if(handlerObj != null) {
         if( handlerObj.streamON && handlerObj.nviewers == 1 ) {
-            handlerObj.stream.kill()
+            //handlerObj.stream.kill()
             handlerObj.stream = null
             handlerObj.streamON = false
+            _ = spawn('python3', ['/home/camera/camera/SE-2023/src/RPI/scripts/streamOff.py'])
             handlerObj.nviewers = 0
             console.log("Stream stopped")
             return "Stream stopped"
@@ -50,6 +52,7 @@ module.exports.stopStream = function (handlerObj){
         } else if ( handlerObj.streamON && handlerObj.nviewers > 1 ) {
             handlerObj.nviewers--
             console.log("Viewer count: "+ handlerObj.nviewers)
+            _ = spawn('python3', ['/home/camera/camera/SE-2023/src/RPI/scripts/streamOff.py'])
             return "Stream stopped for user"
         }
     }

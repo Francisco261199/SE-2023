@@ -30,10 +30,12 @@ module.exports.initRec = function (handlerObj){
                 console.log("Recording terminated")
                 //handlerObj.Rec.kill()
                 handlerObj.Rec = null
+                //db.collection(collectionName).insertOne({"path": files[index], "datetime": handlerObj.startTime})
                 handlerObj.startTime = 0
                 clearInterval(handlerObj.intervalId)
                 handlerObj.intervalId = null
                 _ = spawn('python3', ['/home/camera/camera/SE-2023/src/RPI/scripts/sendarduino.py', '0'])
+                
             });
 
             return "Recording started"
@@ -43,7 +45,7 @@ module.exports.initRec = function (handlerObj){
                 console.log("startTime: "+ handlerObj.startTime)
                 var elapsed_time = Math.floor(Date.now() - handlerObj.startTime)
                 console.log("Elapsed time: "+ elapsed_time)
-                if (elapsed_time > (60 * 10000) || handlerObj.Rec == null) {
+                if (elapsed_time > (60 * 1000) || handlerObj.Rec == null) {
                     if (handlerObj.Rec != null) {
                         handlerObj.Rec.kill()
                     }
