@@ -1,5 +1,6 @@
 package com.se.ding.network;
 
+// Stream data structure for retrofit
 public class Stream {
     private String host;
     private String port;

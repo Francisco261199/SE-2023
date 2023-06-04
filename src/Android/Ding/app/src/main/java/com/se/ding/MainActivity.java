@@ -30,13 +30,14 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView videoCatalog;
     private VideoAdapter videoAdapter;
 
-    private List<Video> videoList = new ArrayList<>();
+    private List<Video> videoList = new ArrayList<>(); // List containing all video data
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Extract access token
         SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
         String accessToken = sharedPref.getString("access_token", null);
         if (accessToken == null) {
@@ -49,11 +50,13 @@ public class MainActivity extends AppCompatActivity {
         mLiveButton = findViewById(R.id.live_button);
         mLogoutButton = findViewById(R.id.logout_button);
 
+        // Create video list view using recyclerview with custom adapter
         videoCatalog = findViewById(R.id.video_catalog);
         videoCatalog.setLayoutManager(new GridLayoutManager(this, 1));
         videoAdapter = new VideoAdapter(videoList, this);
         videoCatalog.setAdapter(videoAdapter);
 
+        // Populate video list with data from server
         Call<List<Video>> call = Client.getService().getVideoCatalog("Bearer " + accessToken);
         call.enqueue(new Callback<List<Video>>() {
             @Override
@@ -65,19 +68,19 @@ public class MainActivity extends AppCompatActivity {
                     videoAdapter.notifyDataSetChanged();
                     // Display the video catalog
                 } else {
-                    // Handle the error
                     Log.d("WEB", "Video retrieval failed");
+                    Toast.makeText(MainActivity.this, "Video retrieval failed", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Video>> call, Throwable t) {
-                // Handle the error
                 Toast.makeText(MainActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
                 Log.d("WEB", t.toString());
             }
         });
 
+        // Logout and return to login menu
         mLogoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,9 +95,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Try to start camera stream viewing
         mLiveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Check for token
                 SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
                 String accessToken = sharedPref.getString("access_token", null);
                 if (accessToken != null) {
@@ -103,10 +108,10 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<Stream> call, Response<Stream> response) {
                             if (response.isSuccessful()) {
-                                String url = "http://" + response.body().getHost() + ":" + response.body().getPort();
-                                // Start a new activity to play the video
+                                // Start a new activity to play the stream
                                 Intent intent = new Intent(MainActivity.this, VideoPlayerActivity.class);
-                                intent.putExtra("videoUrl", url);
+                                String streamURL = "rtsp://" + Client.getHOST() + ":8554/stream";
+                                intent.putExtra("videoUrl", streamURL);
                                 intent.putExtra("isStreaming", true);
                                 startActivity(intent);
                             } else {

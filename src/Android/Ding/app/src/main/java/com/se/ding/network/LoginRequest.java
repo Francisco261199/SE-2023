@@ -1,5 +1,6 @@
 package com.se.ding.network;
 
+// User credential data structure for retrofit
 public class LoginRequest {
     private String username;
     private String password;

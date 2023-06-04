@@ -1,5 +1,6 @@
 package com.se.ding.network;
 
+// Video data structure for retrofit
 public class Video {
     private String id;
     private String path;

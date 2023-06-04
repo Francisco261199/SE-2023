@@ -27,6 +27,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+// Class responsible for handling firebase notifications
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -35,7 +36,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Log.d("FCM", "Message data payload: " + remoteMessage.getData());
-            Map<String, String> data = remoteMessage.getData();
         }
 
         // Check if message contains a notification payload.
@@ -47,10 +47,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
+    // Send an android notification
     private void sendNotification(String title, String body) {
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_IMMUTABLE);
 
         String channelId = "fcm_default_channel";
@@ -75,12 +76,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(0, notificationBuilder.build());
     }
 
+    // When new token is generated
     @Override
     public void onNewToken(String token) {
         super.onNewToken(token);
+        // Send the new token to the server
         Call<Void> call = Client.getService().registerDevice(new Token(token));
         call.enqueue(new Callback<Void>() {
             @Override
@@ -94,7 +97,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                // Handle the error
                 Log.d("FCM", t.toString());
             }
         });

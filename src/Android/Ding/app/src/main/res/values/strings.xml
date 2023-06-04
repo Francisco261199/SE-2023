@@ -53,4 +53,7 @@
     <string name="email">Email</string>
     <string name="registration">Registration</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="host">Host</string>
+    <string name="port">Port</string>
+    <string name="save">Save</string>
 </resources>

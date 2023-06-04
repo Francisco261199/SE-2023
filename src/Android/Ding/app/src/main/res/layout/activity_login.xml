@@ -25,19 +25,28 @@
         app:layout_constraintVertical_bias="0.3">
 
         <EditText
-            android:id="@+id/server_edittext"
+            android:id="@+id/server_host"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Server Address"
+            android:hint="@string/host"
+            android:minWidth="200dp"
+            android:minHeight="70dp"
+            android:textColor="@color/palette_color1" />
+
+        <EditText
+            android:id="@+id/server_port"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/port"
             android:minWidth="200dp"
             android:minHeight="70dp"
             android:textColor="@color/palette_color1" />
 
         <Button
-            android:id="@+id/connect_button"
+            android:id="@+id/save_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Connect"
+            android:text="@string/save"
             android:textColor="@color/palette_color1"
             app:backgroundTint="@color/palette_color2" />
 

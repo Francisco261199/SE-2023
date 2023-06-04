@@ -24,10 +24,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+// Adapter for video recyclerview
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> {
     private List<Video> videoItems;
     private Context context;
-    private int highlightedPosition = -1;
 
     public VideoAdapter(List<Video> videoItems, Context context) {
         this.videoItems = videoItems;
@@ -35,7 +35,6 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     }
 
     public void setHighlightedPosition(int position) {
-        highlightedPosition = position;
         notifyDataSetChanged();
     }
 
@@ -50,35 +49,12 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Video videoItem = videoItems.get(position);
         holder.videoId = videoItem.getId();
+
+        // set the video content as the datetime
         holder.buttonVideo.setText(videoItem.getDatetime());
 
         // Set the video URL as the button's tag
         holder.buttonVideo.setTag(videoItem.getPath());
-
-        // Check if the current item should be highlighted
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            if (highlightedPosition == position) {
-                // Create a ValueAnimator to animate the background color
-                ValueAnimator colorAnimator = null;
-                colorAnimator = ValueAnimator.ofArgb(
-                        ContextCompat.getColor(holder.buttonVideo.getContext(), R.color.highlight_start_color),
-                        ContextCompat.getColor(holder.buttonVideo.getContext(), R.color.highlight_end_color)
-                );
-
-                // Set the duration and animation listener
-                colorAnimator.setDuration(1000); // Adjust the duration as desired
-                colorAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animator) {
-                        // Update the background color of the item
-                        holder.buttonVideo.setBackgroundColor((int) animator.getAnimatedValue());
-                    }
-                });
-
-                // Start the color animation
-                colorAnimator.start();
-            }
-        }
     }
 
     @Override
@@ -100,13 +76,16 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
             buttonVideo = itemView.findViewById(R.id.button_video);
             buttonDelete = itemView.findViewById(R.id.button_delete);
             buttonVideo.setOnClickListener(this);
+            // Delete video button
             buttonDelete.setOnClickListener(view -> {
+                // Get access token
                 SharedPreferences sharedPref = context.getSharedPreferences("preferences", Context.MODE_PRIVATE);
                 String accessToken = sharedPref.getString("access_token", null);
                 if (accessToken == null) {
                     // User needs to log in
                     Toast.makeText(context, "Authentication Failed", Toast.LENGTH_SHORT).show();
                 } else {
+                    // Delete request
                     Call<Void> call = Client.getService().deleteVideo("Bearer " + accessToken, videoId);
                     call.enqueue(new Callback<Void>() {
                         @Override
@@ -118,14 +97,13 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
                                 videoItems.remove(adapterPosition);
                                 notifyItemRemoved(adapterPosition);
                             } else {
-                                // Handle the error
                                 Log.d("WEB", "Video deletion failed");
+                                Toast.makeText(context, "Video deletion failed", Toast.LENGTH_SHORT).show();
                             }
                         }
 
                         @Override
                         public void onFailure(Call<Void> call, Throwable t) {
-                            // Handle the error
                             Toast.makeText(context, t.toString(), Toast.LENGTH_SHORT).show();
                             Log.d("WEB", t.toString());
                         }
@@ -137,7 +115,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             // Retrieve the video URL from the button's tag
-            String videoUrl = Client.getBaseURL() + "videos/" + (String) buttonVideo.getTag();;
+            String videoUrl = Client.getBaseURL() + "/videos/" + (String) buttonVideo.getTag();
 
             // Start a new activity to play the video
             Intent intent = new Intent(context, VideoPlayerActivity.class);

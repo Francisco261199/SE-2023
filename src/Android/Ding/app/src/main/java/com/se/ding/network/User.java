@@ -1,5 +1,6 @@
 package com.se.ding.network;
 
+// User data structure for retrofit
 public class User {
     private String username;
     private String email;

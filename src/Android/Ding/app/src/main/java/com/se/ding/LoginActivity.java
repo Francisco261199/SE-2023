@@ -27,6 +27,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+// Activity responsible for specifying server address, performing login and registering users
 public class LoginActivity extends AppCompatActivity {
     private EditText mUsernameEditText;
     private EditText mPasswordEditText;
@@ -37,46 +38,16 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(new OnCompleteListener<String>() {
-                    @Override
-                    public void onComplete(@NonNull Task<String> task) {
-                        if (!task.isSuccessful()) {
-                            Log.w("FCM", "Fetching FCM registration token failed", task.getException());
-                            return;
-                        }
-
-                        // Get new FCM registration token
-                        token = task.getResult();
-                        Log.d("FCM", token);
-                        Toast.makeText(LoginActivity.this, token, Toast.LENGTH_SHORT).show();
-                        Call<Void> call = Client.getService().registerDevice(new Token(token));
-                        call.enqueue(new Callback<Void>() {
-                            @Override
-                            public void onResponse(Call<Void> call, Response<Void> response) {
-                                if (response.isSuccessful()) {
-                                    Log.d("FCM", "Device Registered");
-                                } else {
-                                    Log.d("FCM", "Device Registration Failed");
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Void> call, Throwable t) {
-                                // Handle the error
-                                Log.d("FCM", t.toString());
-                            }
-                        });
-                    }
-                });
-
-        EditText serverAddress = findViewById(R.id.server_edittext);
-        Button connectButton = findViewById(R.id.connect_button);
-        connectButton.setOnClickListener(v -> {
-            Log.d("WEB", "Before: " + Client.getBaseURL());
-            String address = serverAddress.getText().toString();
-            Client.setBaseURL(address);
-            Log.d("WEB", "After: " + Client.getBaseURL());
+        EditText serverHost = findViewById(R.id.server_host);
+        EditText serverPort = findViewById(R.id.server_port);
+        Button saveButton = findViewById(R.id.save_button);
+        // Save server information and send firebase device token
+        saveButton.setOnClickListener(v -> {
+            String host = serverHost.getText().toString();
+            String port = serverPort.getText().toString();
+            Client.setHost(host);
+            Client.setPort(port);
+            // Get firebase device token on start and register it with server. If he token is already registered, does nothing.
             FirebaseMessaging.getInstance().getToken()
                     .addOnCompleteListener(new OnCompleteListener<String>() {
                         @Override
@@ -89,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Get new FCM registration token
                             token = task.getResult();
                             Log.d("FCM", token);
-                            Toast.makeText(LoginActivity.this, token, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(LoginActivity.this, token, Toast.LENGTH_SHORT).show();
                             Call<Void> call = Client.getService().registerDevice(new Token(token));
                             call.enqueue(new Callback<Void>() {
                                 @Override
@@ -103,7 +74,6 @@ public class LoginActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onFailure(Call<Void> call, Throwable t) {
-                                    // Handle the error
                                     Log.d("FCM", t.toString());
                                 }
                             });
@@ -116,16 +86,19 @@ public class LoginActivity extends AppCompatActivity {
         Button mLoginButton = findViewById(R.id.login_button);
         Button mRegisterButton = findViewById(R.id.register_button);
 
+        // perform login
         mLoginButton.setOnClickListener(v -> {
             String username = mUsernameEditText.getText().toString();
             String password = mPasswordEditText.getText().toString();
 
             LoginRequest loginRequest = new LoginRequest(username, password);
+            // create login request
             Call<Token> call = Client.getService().login(loginRequest);
             call.enqueue(new Callback<Token>() {
                 @Override
                 public void onResponse(Call<Token> call, Response<Token> response) {
                     if (response.isSuccessful()) {
+                        // get access token
                         Token accessToken = response.body();
                         // Save the access token for future requests
                         SharedPreferences sharedPref = getSharedPreferences("preferences", Context.MODE_PRIVATE);
@@ -133,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("access_token", accessToken.getToken());
                         editor.apply();
 
+                        // go to main activity
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
@@ -144,13 +118,13 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Token> call, Throwable t) {
-                    // Handle the error
                     Toast.makeText(LoginActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
                     Log.d("WEB", t.toString());
                 }
             });
         });
 
+        // Registration menu
         mRegisterButton.setOnClickListener(v -> {
             // Create the dialog builder
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -168,6 +142,7 @@ public class LoginActivity extends AppCompatActivity {
 
             AlertDialog dialog = builder.create();
 
+            // Register button
             registerButton.setOnClickListener(new View.OnClickListener()  {
                 @Override
                 public void onClick(View v) {
@@ -177,6 +152,7 @@ public class LoginActivity extends AppCompatActivity {
                     String password = passwordEditText.getText().toString();
                     String confirmPassword = confirmEditText.getText().toString();
 
+                    // Check if passwords match
                     if (password.equals(confirmPassword)) {
                         User newUser = new User(username, email, password);
                         Call<Void> call = Client.getService().createUser(newUser);
@@ -184,17 +160,15 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(Call<Void> call, Response<Void> response) {
                                 if (response.isSuccessful()) {
-                                    // Handle the success
                                     dialog.dismiss();
                                 } else {
-                                    // Handle the error
-                                    Log.d("WEB", "Response Fail");
+                                    Log.d("WEB", "Response Failed");
+                                    Toast.makeText(LoginActivity.this, "Response Failed", Toast.LENGTH_SHORT).show();
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<Void> call, Throwable t) {
-                                // Handle the error
                                 Toast.makeText(LoginActivity.this, t.toString(), Toast.LENGTH_SHORT).show();
                                 Log.d("WEB", t.toString());
                             }
@@ -205,6 +179,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
 
+            // show registration menu
             dialog.show();
         });
     }
